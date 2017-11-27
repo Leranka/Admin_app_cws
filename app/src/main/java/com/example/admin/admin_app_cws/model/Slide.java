@@ -6,29 +6,20 @@ package com.example.admin.admin_app_cws.model;
 
 public class Slide {
 
-    String url;
-    String url2;
-    String url3;
+    String pic1;
+    String pic2;
+    String pic3;
 
 
     public Slide() {
     }
 
-    public Slide(String url, String url2, String url3) {
-        this.url = url;
-        this.url2 = url2;
-        this.url3 = url3;
+    public Slide(String url, String pic2, String url3) {
+        this.pic1 = url;
+        this.pic2 = pic2;
+        this.pic3 = url3;
     }
 
-    public String getUrl() {
-        return url;
-    }
 
-    public String getUrl2() {
-        return url2;
-    }
 
-    public String getUrl3() {
-        return url3;
-    }
 }

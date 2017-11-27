@@ -45,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
     String urI, uri2, uri3;
 
+    String featUri,featUr2,featUri3;
+
+    boolean valid = false;
     private EditText EdtPlaceName, EdtPlaceInfor, EdtAddress, EdtCell, edtWorkingHours, EdtWebsite, edtLongitude, edtLatitude, edtPrice, edtCloseTime, edtOpenTime;
     private Uri imgUri, imgUri2, imgUri3;
 
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
 
 
-        mDatabaseRefWorkingHours = database.getReference( ).child("working_hours_2");
+        mDatabaseRefWorkingHours = database.getReference( ).child("new_working_hours");
 
         imageView = (ImageView) findViewById(R.id.ImageView);
 
@@ -261,9 +264,9 @@ public class MainActivity extends AppCompatActivity {
                     Slide slide = new Slide(urI + "", uri2 + "", "" + uri3);
 
 
-                    mDatabaseRefPlaces.child(key).setValue(details);
+                    mDatabaseRefPlaces.child(key).child("details").setValue(details);
                     mDatabaseRefSlide.child(placeName).setValue(slide);
-
+                    saveHours();
 
                     //clearing the EditText
                     EdtPlaceName.getText().clear();
@@ -315,9 +318,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void saveHours(View view) {
+    public void saveHours( ) {
 
-        boolean valid = false;
+
 
         if (valid == false) {
 
@@ -330,8 +333,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
                    working_hours hours = new working_hours(closeTime, openTime);
-                    mDatabaseRefWorkingHours.child("Khutso").setValue(hours);
-
+                    mDatabaseRefWorkingHours.child(placeName).setValue(hours);
+                    valid =true;
                     /*mDatabaseRefWorkingHours = FirebaseDatabase.getInstance().getReference("new_working_hours");
 
                     mDatabaseRefWorkingHours.setValue(hours);*/
