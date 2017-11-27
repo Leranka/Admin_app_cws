@@ -4,8 +4,8 @@ package com.example.admin.admin_app_cws.model;
 
 public class working_hours {
 
-    String close_time ;
-    String open_time;
+   public String close_time ;
+    public String open_time;
 
 
     public working_hours() {

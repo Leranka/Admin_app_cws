@@ -17,10 +17,14 @@ import android.widget.Toast;
 
 import com.example.admin.admin_app_cws.model.Slide;
 import com.example.admin.admin_app_cws.model.details;
+import com.example.admin.admin_app_cws.model.working_hours;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -32,15 +36,16 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
 
     private StorageReference mStorageRef;
-    private DatabaseReference mDatabaseRefPlaces, mDatabaseRefSlide;
+    private DatabaseReference mDatabaseRefPlaces, mDatabaseRefSlide, mDatabaseRefWorkingHours;
     private ImageView imageView;
+    FirebaseDatabase database;
 
     // fields of the details
-    String placeLongitude, placeLatitude, placeAddress, placeCell, placeHours, placeInfo, placeName, PlacePrice, placeWebsite;
+    String placeLongitude, placeLatitude, placeAddress, placeCell, placeHours, placeInfo, placeName, PlacePrice, placeWebsite, openTime, closeTime;
 
     String urI, uri2, uri3;
 
-    private EditText EdtPlaceName, EdtPlaceInfor, EdtAddress, EdtCell, edtWorkingHours, EdtWebsite, edtLongitude, edtLatitude, edtPrice;
+    private EditText EdtPlaceName, EdtPlaceInfor, EdtAddress, EdtCell, edtWorkingHours, EdtWebsite, edtLongitude, edtLatitude, edtPrice, edtCloseTime, edtOpenTime;
     private Uri imgUri, imgUri2, imgUri3;
 
 
@@ -56,8 +61,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
+
         mDatabaseRefPlaces = FirebaseDatabase.getInstance().getReference("new_places");
         mDatabaseRefSlide = FirebaseDatabase.getInstance().getReference("new_Slide");
+        database = FirebaseDatabase.getInstance();
+
+
+        mDatabaseRefWorkingHours = database.getReference( ).child("working_hours_2");
 
         imageView = (ImageView) findViewById(R.id.ImageView);
 
@@ -70,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
         edtLongitude = (EditText) findViewById(R.id.edtLongitude);
         edtLatitude = (EditText) findViewById(R.id.edtLatitude);
         edtPrice = (EditText) findViewById(R.id.edtPrice);
+        edtCloseTime = (EditText) findViewById(R.id.edtCloseTime);
+        edtOpenTime = (EditText) findViewById(R.id.edtOpenTime);
 
     }
 
@@ -131,7 +143,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-        }  //Slide pic 3
+        }
+
+        //Slide pic 3
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
             imgUri3 = data.getData();
 
@@ -197,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 //for silde 2
-            ref2.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            ref2.putFile(imgUri2).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
@@ -207,20 +221,11 @@ public class MainActivity extends AppCompatActivity {
             });
 
 //for silde 3
-            ref3.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            ref3.putFile(imgUri3).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                     uri3 = taskSnapshot.getDownloadUrl().toString();
-
-                }
-            });
-
-            ref2.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                    uri2 = taskSnapshot.getDownloadUrl().toString();
 
                 }
             });
@@ -253,10 +258,12 @@ public class MainActivity extends AppCompatActivity {
 
                     details details = new details(placeLatitude, placeLongitude, placeAddress, placeCell, placeHours, placeInfo, placeName, PlacePrice, placeWebsite);
 
-                    Slide slide = new Slide(urI + "", uri2 + "", ""+uri3);
+                    Slide slide = new Slide(urI + "", uri2 + "", "" + uri3);
+
 
                     mDatabaseRefPlaces.child(key).setValue(details);
                     mDatabaseRefSlide.child(placeName).setValue(slide);
+
 
                     //clearing the EditText
                     EdtPlaceName.getText().clear();
@@ -307,5 +314,39 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    public void saveHours(View view) {
+
+        boolean valid = false;
+
+        if (valid == false) {
+
+            openTime = edtOpenTime.getText().toString().trim();
+            closeTime = edtCloseTime.getText().toString().trim();
+
+
+            mDatabaseRefWorkingHours.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                   working_hours hours = new working_hours(closeTime, openTime);
+                    mDatabaseRefWorkingHours.child("Khutso").setValue(hours);
+
+                    /*mDatabaseRefWorkingHours = FirebaseDatabase.getInstance().getReference("new_working_hours");
+
+                    mDatabaseRefWorkingHours.setValue(hours);*/
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        } else {
+            Toast.makeText(this, " already saved", Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
 }
