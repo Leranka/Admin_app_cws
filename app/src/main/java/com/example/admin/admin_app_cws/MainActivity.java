@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.admin.admin_app_cws.model.Slide;
 import com.example.admin.admin_app_cws.model.details;
+import com.example.admin.admin_app_cws.model.features;
 import com.example.admin.admin_app_cws.model.working_hours;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,7 +37,7 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
 
     private StorageReference mStorageRef;
-    private DatabaseReference mDatabaseRefPlaces, mDatabaseRefSlide, mDatabaseRefWorkingHours;
+    private DatabaseReference mDatabaseRefPlaces, mDatabaseRefSlide, mDatabaseRefWorkingHours, mDataRefFeat;
     private ImageView imageView;
     FirebaseDatabase database;
 
@@ -45,11 +46,13 @@ public class MainActivity extends AppCompatActivity {
 
     String urI, uri2, uri3;
 
-    String featUri,featUr2,featUri3;
+    String featUri, featUr2, featUri3;
 
     boolean valid = false;
     private EditText EdtPlaceName, EdtPlaceInfor, EdtAddress, EdtCell, edtWorkingHours, EdtWebsite, edtLongitude, edtLatitude, edtPrice, edtCloseTime, edtOpenTime;
     private Uri imgUri, imgUri2, imgUri3;
+
+    private Uri FeatimgUri, FeatimgUri2, FeatimgUri3;
 
 
     public static final String FB_STORAGE_PATH = "new_places/";
@@ -67,10 +70,11 @@ public class MainActivity extends AppCompatActivity {
 
         mDatabaseRefPlaces = FirebaseDatabase.getInstance().getReference("new_places");
         mDatabaseRefSlide = FirebaseDatabase.getInstance().getReference("new_Slide");
+        mDataRefFeat = FirebaseDatabase.getInstance().getReference("Features");
         database = FirebaseDatabase.getInstance();
 
 
-        mDatabaseRefWorkingHours = database.getReference( ).child("new_working_hours");
+        mDatabaseRefWorkingHours = database.getReference().child("new_working_hours");
 
         imageView = (ImageView) findViewById(R.id.ImageView);
 
@@ -114,9 +118,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     //Browse image to upload for pic 1
     public void upLoadFeatPic1(View view) {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select image"), REQUEST_CODE);
+    }
+
+    public void upLoadFeatPic2(View view) {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select image"), REQUEST_CODE);
+    }
+
+
+
+    public void upLoadFeatPic3(View view) {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -175,9 +194,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+        // Feature 1
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            FeatimgUri = data.getData();
+
+            try {
+                Bitmap bm = MediaStore.Images.Media.getBitmap(getContentResolver(), FeatimgUri);
+                imageView.setImageBitmap(bm);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
-
+    //Slide pics
     public String getIamgeExt(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
@@ -197,6 +230,17 @@ public class MainActivity extends AppCompatActivity {
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
+
+
+    //Feat icon
+    public String getIamgeExtFeat1(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+
+
 
 
     //Uploading image
@@ -219,13 +263,17 @@ public class MainActivity extends AppCompatActivity {
             dialog.setTitle("saving");
             dialog.show();
 
-            //Get the storage reference
+            //Get the storage reference for slide pics
             StorageReference ref = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExt(imgUri));
             StorageReference ref2 = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExt2(imgUri2));
             StorageReference ref3 = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExt3(imgUri3));
 
 
-//for silde 2
+            //Get the storage reference for feat icon
+            StorageReference refFeat1 = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExtFeat1(FeatimgUri));
+
+
+            //for silde 2
             ref2.putFile(imgUri2).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -235,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-//for silde 3
+            //for silde 3
             ref3.putFile(imgUri3).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -246,6 +294,20 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
+            //for Feat1 1
+            refFeat1.putFile(FeatimgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    featUri = taskSnapshot.getDownloadUrl().toString();
+
+                }
+            });
+
+
+
+
+            //for silde 1
             ref.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -273,12 +335,11 @@ public class MainActivity extends AppCompatActivity {
 
                     details details = new details(placeLatitude, placeLongitude, placeAddress, placeCell, placeHours, placeInfo, placeName, PlacePrice, placeWebsite);
 
-                    Slide slide = new Slide(urI + "", uri2 + "", "" + uri3);
-
-
                     mDatabaseRefPlaces.child(key).child("details").setValue(details);
-                    mDatabaseRefSlide.child(placeName).setValue(slide);
                     saveHours();
+                    saveSlide();
+                    SaveFeat();
+
 
                     //clearing the EditText
                     EdtPlaceName.getText().clear();
@@ -291,7 +352,6 @@ public class MainActivity extends AppCompatActivity {
                     edtLongitude.getText().clear();
                     edtLatitude.getText().clear();
                     edtPrice.getText().clear();
-
 
                 }
             })
@@ -329,27 +389,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    public void saveHours( ) {
-
-
+    //Working hours
+    public void saveHours() {
 
         if (valid == false) {
 
             openTime = edtOpenTime.getText().toString().trim();
             closeTime = edtCloseTime.getText().toString().trim();
 
-
             mDatabaseRefWorkingHours.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                   working_hours hours = new working_hours(closeTime, openTime);
+                    working_hours hours = new working_hours(closeTime, openTime);
                     mDatabaseRefWorkingHours.child(placeName).setValue(hours);
-                    valid =true;
-                    /*mDatabaseRefWorkingHours = FirebaseDatabase.getInstance().getReference("new_working_hours");
-
-                    mDatabaseRefWorkingHours.setValue(hours);*/
+                    valid = true;
                 }
 
                 @Override
@@ -364,4 +418,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //Slide
+    public void saveSlide() {
+
+        mDatabaseRefSlide.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Slide slide = new Slide(urI + "", uri2 + "", "" + uri3);
+                mDatabaseRefSlide.child("pictures").child(placeName).setValue(slide);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+
+    //features
+
+    public void SaveFeat() {
+        features feat = new features(featUri +"",featUr2  +"",featUri3 +"" );
+        mDataRefFeat.child(placeName).child("features").setValue(feat);
+
+    }
 }

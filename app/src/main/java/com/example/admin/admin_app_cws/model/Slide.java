@@ -6,9 +6,9 @@ package com.example.admin.admin_app_cws.model;
 
 public class Slide {
 
-    String pic1;
-    String pic2;
-    String pic3;
+  public   String pic1;
+   public   String pic2;
+    public String pic3;
 
 
     public Slide() {

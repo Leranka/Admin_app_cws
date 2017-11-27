@@ -151,6 +151,7 @@
                 <Button
                     android:id="@+id/FeaturePic1"
                     android:layout_width="0dp"
+                    android:onClick="upLoadFeatPic1"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="  Feature pic 1" />
@@ -169,10 +170,7 @@
                     android:layout_weight="1"
                     android:text="  Feature pic 3" />
 
-
             </LinearLayout>
-
-
 
                 <Button
                     android:id="@+id/btnSave"
@@ -180,12 +178,6 @@
                     android:layout_height="wrap_content"
                     android:onClick="btnUpload_Click"
                     android:text="save" />
-
-
-
-
-
-
 
             <ImageView
                 android:id="@+id/ImageView"
