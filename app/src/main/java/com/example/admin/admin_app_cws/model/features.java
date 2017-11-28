@@ -14,9 +14,9 @@ public class features {
     public features() {
     }
 
-    public features(String feature1, String feature2 ) {
+    public features(String feature1, String feature2, String feature3) {
         this.feature1 = feature1;
         this.feature2 = feature2;
-
+        this.feature3 = feature3;
     }
 }

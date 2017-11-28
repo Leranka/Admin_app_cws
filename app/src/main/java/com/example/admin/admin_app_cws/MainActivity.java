@@ -131,14 +131,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     public void upLoadFeatPic3(View view) {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select image"), REQUEST_CODE);
     }
-
 
 
     @Override
@@ -205,6 +203,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
+        // Feature 2
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            FeatimgUri2 = data.getData();
+
+            try {
+                Bitmap bm = MediaStore.Images.Media.getBitmap(getContentResolver(), FeatimgUri2);
+                imageView.setImageBitmap(bm);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Feature 3
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            FeatimgUri3 = data.getData();
+
+            try {
+                Bitmap bm = MediaStore.Images.Media.getBitmap(getContentResolver(), FeatimgUri3);
+                imageView.setImageBitmap(bm);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //Slide pics
@@ -237,14 +263,20 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
     public String getIamgeExtFeat2(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+
+
     }
 
-
-
+    public String getIamgeExtFeat3(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
 
 
     //Uploading image
@@ -276,6 +308,7 @@ public class MainActivity extends AppCompatActivity {
             //Get the storage reference for feat icon
             StorageReference refFeat1 = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExtFeat1(FeatimgUri));
             StorageReference refFeat2 = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExtFeat2(FeatimgUri2));
+            StorageReference refFeat3 = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExtFeat3(FeatimgUri3));
 
 
             //for silde 2
@@ -320,18 +353,19 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
+            //for Feat1 3
+            refFeat3.putFile(FeatimgUri3).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    featUri3 = taskSnapshot.getDownloadUrl().toString();
+                }
+            });
 
 
             //for silde 1
             ref.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-
-                    //Dimiss dialog when success
-                    dialog.dismiss();
-                    //Display success toast msg
-                    Toast.makeText(getApplicationContext(), "saved", Toast.LENGTH_SHORT).show();
 
                     placeLongitude = edtLongitude.getText().toString().trim();
                     placeLatitude = edtLatitude.getText().toString().trim();
@@ -343,7 +377,6 @@ public class MainActivity extends AppCompatActivity {
                     PlacePrice = edtPrice.getText().toString();
                     placeWebsite = EdtWebsite.getText().toString().trim();
 
-
                     urI = taskSnapshot.getDownloadUrl().toString();
 
                     String key = mDatabaseRefPlaces.push().getKey();
@@ -351,8 +384,8 @@ public class MainActivity extends AppCompatActivity {
                     details details = new details(placeLatitude, placeLongitude, placeAddress, placeCell, placeHours, placeInfo, placeName, PlacePrice, placeWebsite);
 
                     mDatabaseRefPlaces.child(key).child("details").setValue(details);
-                    //saveHours();
-                    //saveSlide();
+                    saveHours();
+                    saveSlide();
                     SaveFeat();
 
 
@@ -367,7 +400,8 @@ public class MainActivity extends AppCompatActivity {
                     edtLongitude.getText().clear();
                     edtLatitude.getText().clear();
                     edtPrice.getText().clear();
-
+                    Toast.makeText(getApplicationContext(), "saved", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
                 }
             })
                     .addOnFailureListener(new OnFailureListener() {
@@ -451,9 +485,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     //features
-
     public void SaveFeat() {
-        features feat = new features(featUri +"",featUri2 +"" );
+        features feat = new features(featUri + "", featUri2 , "" +featUri3);
         mDataRefFeat.child(placeName).setValue(feat);
 
     }

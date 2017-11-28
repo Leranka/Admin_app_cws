@@ -167,6 +167,7 @@
                 <Button
                     android:id="@+id/FeaturePic3"
                     android:layout_width="0dp"
+                    android:onClick="upLoadFeatPic3"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="  Feature pic 3" />
