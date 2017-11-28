@@ -45,20 +45,18 @@ public class MainActivity extends AppCompatActivity {
     String placeLongitude, placeLatitude, placeAddress, placeCell, placeHours, placeInfo, placeName, PlacePrice, placeWebsite, openTime, closeTime;
 
     String urI, uri2, uri3;
+    String featUri, featUri2, featUri3;
 
-    String featUri, featUr2, featUri3;
 
-    boolean valid = false;
-    private EditText EdtPlaceName, EdtPlaceInfor, EdtAddress, EdtCell, edtWorkingHours, EdtWebsite, edtLongitude, edtLatitude, edtPrice, edtCloseTime, edtOpenTime;
     private Uri imgUri, imgUri2, imgUri3;
-
     private Uri FeatimgUri, FeatimgUri2, FeatimgUri3;
 
 
     public static final String FB_STORAGE_PATH = "new_places/";
 
     public static final int REQUEST_CODE = 1234;
-
+    boolean valid = false;
+    private EditText EdtPlaceName, EdtPlaceInfor, EdtAddress, EdtCell, edtWorkingHours, EdtWebsite, edtLongitude, edtLatitude, edtPrice, edtCloseTime, edtOpenTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select image"), REQUEST_CODE);
-
     }
 
     //Browse image to upload for pic 2
@@ -232,8 +229,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Feat icon
+    //Feat icon 1 - 3
     public String getIamgeExtFeat1(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+
+
+    }
+    public String getIamgeExtFeat2(Uri uri) {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
@@ -271,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
 
             //Get the storage reference for feat icon
             StorageReference refFeat1 = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExtFeat1(FeatimgUri));
+            StorageReference refFeat2 = mStorageRef.child(FB_STORAGE_PATH + System.currentTimeMillis() + "." + getIamgeExtFeat2(FeatimgUri2));
 
 
             //for silde 2
@@ -300,6 +305,16 @@ public class MainActivity extends AppCompatActivity {
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                     featUri = taskSnapshot.getDownloadUrl().toString();
+
+                }
+            });
+
+            //for Feat1 2
+            refFeat2.putFile(FeatimgUri2).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    featUri2 = taskSnapshot.getDownloadUrl().toString();
 
                 }
             });
@@ -336,8 +351,8 @@ public class MainActivity extends AppCompatActivity {
                     details details = new details(placeLatitude, placeLongitude, placeAddress, placeCell, placeHours, placeInfo, placeName, PlacePrice, placeWebsite);
 
                     mDatabaseRefPlaces.child(key).child("details").setValue(details);
-                    saveHours();
-                    saveSlide();
+                    //saveHours();
+                    //saveSlide();
                     SaveFeat();
 
 
@@ -425,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Slide slide = new Slide(urI + "", uri2 + "", "" + uri3);
-                mDatabaseRefSlide.child("pictures").child(placeName).setValue(slide);
+                mDatabaseRefSlide.child(placeName).setValue(slide);
             }
 
             @Override
@@ -438,8 +453,8 @@ public class MainActivity extends AppCompatActivity {
     //features
 
     public void SaveFeat() {
-        features feat = new features(featUri +"",featUr2  +"",featUri3 +"" );
-        mDataRefFeat.child(placeName).child("features").setValue(feat);
+        features feat = new features(featUri +"",featUri2 +"" );
+        mDataRefFeat.child(placeName).setValue(feat);
 
     }
 }
