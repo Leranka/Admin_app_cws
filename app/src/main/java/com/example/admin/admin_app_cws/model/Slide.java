@@ -7,19 +7,23 @@ package com.example.admin.admin_app_cws.model;
 public class Slide {
 
   public   String pic1;
-   public   String pic2;
-    public String pic3;
+  public   String pic2;
+  public   String pic3;
+
 
 
     public Slide() {
     }
 
-    public Slide(String url, String pic2, String url3) {
-        this.pic1 = url;
-        this.pic2 = pic2;
-        this.pic3 = url3;
+    public Slide(String pic1) {
+        this.pic1 = pic1;
+
     }
 
 
-
+  public Slide(String pic1, String pic2, String pic3) {
+    this.pic1 = pic1;
+    this.pic2 = pic2;
+    this.pic3 = pic3;
+  }
 }

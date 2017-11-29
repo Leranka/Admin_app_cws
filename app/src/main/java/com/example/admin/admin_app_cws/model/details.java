@@ -12,8 +12,9 @@ public class details {
     public String PlaceHours;
     public String PlaceInfo;
     public String PlaceName;
-    public String PlacePrice;
+    public int PlacePrice;
     public String PlaceWebsite;
+    public String cover_pic;
 
 
 
@@ -21,7 +22,7 @@ public class details {
 
     }
 
-    public details(String latitude, String longitude, String placeAddress, String placeCell, String placeHours, String placeInfo, String placeName, String placePrice, String placeWebsite ) {
+    public details(String latitude, String longitude, String placeAddress, String placeCell, String placeHours, String placeInfo, String placeName, int placePrice, String placeWebsite, String cover_pic) {
         Latitude = latitude;
         Longitude = longitude;
         PlaceAddress = placeAddress;
@@ -31,6 +32,6 @@ public class details {
         PlaceName = placeName;
         PlacePrice = placePrice;
         PlaceWebsite = placeWebsite;
-
+        this.cover_pic = cover_pic;
     }
 }
